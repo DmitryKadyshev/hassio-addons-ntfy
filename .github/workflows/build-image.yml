@@ -33,7 +33,7 @@ jobs:
             base: ghcr.io/hassio-addons/base/aarch64:20.0.4
           - arch: armv7
             platform: linux/arm/v7
-            base: ghcr.io/hassio-addons/base/armv7:20.0.4
+            base: ghcr.io/hassio-addons/base/armv7:16.3.4
 
     steps:
       - name: Checkout
