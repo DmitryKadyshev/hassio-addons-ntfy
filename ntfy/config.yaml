@@ -1,6 +1,6 @@
 ---
 name: ntfy
-version: 2.21.0
+version: 2.21.1
 slug: ntfy
 description: Send push notifications to your phone or desktop using PUT/POST
 url: https://github.com/binwiederhier/ntfy
