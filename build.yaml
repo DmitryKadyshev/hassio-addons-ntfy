@@ -5,5 +5,5 @@ build_from:
 labels:
   org.opencontainers.image.title: "ntfy: Push Notifications"
   org.opencontainers.image.description: "Send push notifications to your phone or desktop using PUT/POST"
-  org.opencontainers.image.source: "https://github.com/DmitryKadyshev/ntfy-hassio-addon"
+  org.opencontainers.image.source: "https://github.com/DmitryKadyshev/hassio-addons-ntfy"
   org.opencontainers.image.licenses: "Apache-2.0"
