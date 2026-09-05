@@ -29,7 +29,7 @@ ntfy is a simple HTTP-based pub-sub notification service that allows you to send
 2. Go to **Supervisor** → **Add-on Store**
 3. Click on the three dots menu (⋮) in the top right corner
 4. Select **Repositories**
-5. Add this URL: `https://github.com/DmitryKadyshev/ntfy-hassio-addon`
+5. Add this URL: `https://github.com/DmitryKadyshev/hassio-addons-ntfy`
 6. Click **Add**
 
 ### Option 2: Manual installation
@@ -37,7 +37,7 @@ ntfy is a simple HTTP-based pub-sub notification service that allows you to send
 1. Clone this repository into your Home Assistant addons folder:
    ```bash
    cd /config/addons
-   git clone https://github.com/DmitryKadyshev/ntfy-hassio-addon.git
+   git clone https://github.com/DmitryKadyshev/hassio-addons-ntfy.git
    ```
 2. Go to **Supervisor** → **Add-on Store** → Three dots menu → **Check for updates**
 3. Find "ntfy" in the list and install it
