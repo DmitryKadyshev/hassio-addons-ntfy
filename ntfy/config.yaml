@@ -4,7 +4,7 @@ version: 2.21.0
 slug: ntfy
 description: Send push notifications to your phone or desktop using PUT/POST
 url: https://github.com/binwiederhier/ntfy
-webui: http://[HOST]:[PORT:80]
+webui: http://[HOST]:[PORT:8095]
 init: false
 arch:
   - aarch64
@@ -12,9 +12,9 @@ arch:
 map:
   - share:ro
 ports:
-  80/tcp: 80
+  8095/tcp: 8095
 ports_description:
-  80/tcp: HTTP port for ntfy server
+  8095/tcp: HTTP port for ntfy server
 schema:
   base_url: str?
   listen_port: int
@@ -30,12 +30,12 @@ schema:
   smtp_sender_pass: password?
 options:
   base_url: ""
-  listen_port: 80
+  listen_port: 8095
   cache_duration: 12h
   attachment_enabled: false
   auth_enabled: false
   timezone: UTC
 startup: services
 boot: auto
-watchdog: tcp://[HOST]:80/health
+watchdog: tcp://[HOST]:8095/health
 timeout: 30
