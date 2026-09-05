@@ -16,12 +16,24 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
   NTFY_VERSION: v2.21.0
-  BUILD_FROM: ghcr.io/hassio-addons/base:20.0.4
 
 jobs:
   build:
-    name: Build and publish
+    name: Build ${{ matrix.arch }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            platform: linux/amd64
+            base: ghcr.io/hassio-addons/base/amd64:20.0.4
+          - arch: aarch64
+            platform: linux/arm64
+            base: ghcr.io/hassio-addons/base/aarch64:20.0.4
+          - arch: armv7
+            platform: linux/arm/v7
+            base: ghcr.io/hassio-addons/base/armv7:20.0.4
 
     steps:
       - name: Checkout
@@ -50,23 +62,68 @@ jobs:
             type=ref,event=tag
             type=sha,prefix=sha-
 
-      - name: Build and push
+      - name: Build and push architecture image
         uses: docker/build-push-action@v6
         with:
           context: .
-          platforms: linux/amd64,linux/arm64,linux/arm/v7
+          platforms: ${{ matrix.platform }}
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest-${{ matrix.arch }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}-${{ matrix.arch }}
+            ${{ startsWith(github.ref, 'refs/tags/v') && format('{0}-{1}', github.ref_name, matrix.arch) || '' }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
-            BUILD_FROM=${{ env.BUILD_FROM }}
+            BUILD_FROM=${{ matrix.base }}
             NTFY_VERSION=${{ env.NTFY_VERSION }}
-            BUILD_ARCH=${{ github.arch }}
-            BUILD_DATE=${{ github.event.head_commit.timestamp }}
+            BUILD_ARCH=${{ matrix.arch }}
+            BUILD_DATE=${{ github.event.head_commit.timestamp || github.event.repository.updated_at }}
             BUILD_DESCRIPTION=Send push notifications to your phone or desktop using PUT/POST
             BUILD_NAME=ntfy
             BUILD_REF=${{ github.sha }}
             BUILD_REPOSITORY=${{ github.repository }}
             BUILD_VERSION=${{ env.NTFY_VERSION }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=${{ matrix.arch }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.arch }}
+
+  manifest:
+    name: Publish multi-arch manifest
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish latest manifest
+        if: github.ref == 'refs/heads/main'
+        run: |
+          docker buildx imagetools create \
+            -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest \
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest-amd64 \
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest-aarch64 \
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest-armv7
+
+      - name: Publish SHA manifest
+        run: |
+          docker buildx imagetools create \
+            -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}-amd64 \
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}-aarch64 \
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}-armv7
+
+      - name: Publish release manifest
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          docker buildx imagetools create \
+            -t ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }} \
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}-amd64 \
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}-aarch64 \
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}-armv7
