@@ -1,21 +1,20 @@
-name: "ntfy"
-version: "2.21.0"
-slug: "ntfy"
-description: "Send push notifications to your phone or desktop using PUT/POST"
-url: "https://github.com/binwiederhier/ntfy"
+---
+name: ntfy
+version: 2.21.0
+slug: ntfy
+description: Send push notifications to your phone or desktop using PUT/POST
+url: https://github.com/binwiederhier/ntfy
+webui: http://[HOST]:[PORT:80]
+init: false
 arch:
   - aarch64
   - amd64
-  - armv7
-init: false
-hassio_api: false
-homeassistant_api: false
 map:
   - share:ro
 ports:
   80/tcp: 80
 ports_description:
-  80/tcp: "HTTP port for ntfy server"
+  80/tcp: HTTP port for ntfy server
 schema:
   base_url: str?
   listen_port: int(80)
@@ -32,10 +31,10 @@ schema:
 options:
   base_url: ""
   listen_port: 80
-  cache_duration: "12h"
+  cache_duration: 12h
   attachment_enabled: false
   auth_enabled: false
-  timezone: "UTC"
+  timezone: UTC
 startup: services
 boot: auto
 watchdog: tcp://[HOST]:80/health
