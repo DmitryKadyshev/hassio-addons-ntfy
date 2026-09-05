@@ -65,6 +65,7 @@ RUN mkdir -p /var/cache/ntfy /var/lib/ntfy /etc/ntfy
 
 # Copy root filesystem, including the s6-rc service definition
 COPY rootfs /
+RUN chmod +x /etc/s6-overlay/s6-rc.d/ntfy/run /etc/s6-overlay/s6-rc.d/ntfy/finish
 
 # Expose port
 EXPOSE 80/tcp
