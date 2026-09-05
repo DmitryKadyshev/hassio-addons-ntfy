@@ -11,16 +11,16 @@ RUN apk add --no-cache curl && \
         ARCH="amd64"; \
     elif [ "${TARGETARCH}" = "arm64" ]; then \
         ARCH="arm64"; \
-    elif [ "${TARGETARCH}" = "armv7" ]; then \
-        ARCH="arm"; \
+    elif [ "${TARGETARCH}" = "arm" ]; then \
+        ARCH="armv7"; \
     else \
         ARCH="${TARGETARCH}"; \
     fi && \
     version="ntfy_${NTFY_VERSION#v}_${TARGETOS}_${ARCH}" && \
     download_url="https://github.com/binwiederhier/ntfy/releases/download/${NTFY_VERSION}/$version.tar.gz" && \
-    echo $download_url && \
-    curl -L -o /tmp/ntfy.tar.gz "$download_url"  && \
-    tar --strip-components=1  -xzf /tmp/ntfy.tar.gz -C /usr/local/bin $version/ntfy && \
+    echo "$download_url" && \
+    curl --fail --location --retry 3 --retry-delay 2 -o /tmp/ntfy.tar.gz "$download_url" && \
+    tar --strip-components=1 -xzf /tmp/ntfy.tar.gz -C /usr/local/bin "$version/ntfy" && \
     chmod +x /usr/local/bin/ntfy && \
     rm /tmp/ntfy.tar.gz
 
@@ -55,7 +55,7 @@ LABEL \
     org.opencontainers.image.version=${BUILD_VERSION}
 
 # Install runtime dependencies
-RUN apk add --no-cache tzdata ca-certificates
+RUN apk add --no-cache tzdata ca-certificates wget
 
 # Copy ntfy binary from build stage
 COPY --from=build /usr/local/bin/ntfy /usr/local/bin/ntfy
@@ -76,4 +76,3 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 
 # Entry point
 ENTRYPOINT ["/usr/bin/entrypoint.sh"]
-CMD ["serve"]
