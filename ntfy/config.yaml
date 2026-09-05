@@ -17,12 +17,12 @@ ports_description:
   80/tcp: HTTP port for ntfy server
 schema:
   base_url: str?
-  listen_port: int(80)
-  cache_duration: str(12h)
-  attachment_enabled: bool(false)
-  auth_enabled: bool(false)
+  listen_port: int
+  cache_duration: str
+  attachment_enabled: bool
+  auth_enabled: bool
   auth_default_access: list(read-write|read-only|write-only|deny-all)?
-  timezone: str(UTC)
+  timezone: str
   firebase_key_file: str?
   smtp_sender_addr: str?
   smtp_sender_from: str?
