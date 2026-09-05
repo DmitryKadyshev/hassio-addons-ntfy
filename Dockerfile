@@ -63,9 +63,8 @@ COPY --from=build /usr/local/bin/ntfy /usr/local/bin/ntfy
 # Create necessary directories
 RUN mkdir -p /var/cache/ntfy /var/lib/ntfy /etc/ntfy
 
-# Copy configuration script
-COPY rootfs/usr/bin /usr/bin
-RUN chmod +x /usr/bin/*.sh
+# Copy root filesystem, including the s6-rc service definition
+COPY rootfs /
 
 # Expose port
 EXPOSE 80/tcp
@@ -73,6 +72,3 @@ EXPOSE 80/tcp
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD wget --no-verbose --tries=1 --spider http://localhost:80/health || exit 1
-
-# Entry point
-ENTRYPOINT ["/usr/bin/entrypoint.sh"]
